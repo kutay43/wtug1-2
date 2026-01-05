@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akıllı Kafe Stok Paneli</title>
+    <style>
+        /* Genel sayfa tasarımı */
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f0f2f5; 
+            color: #333;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 { text-align: center; color: #1a73e8; }
+
+        /* Arama ve Form alanları */
+        .panel-section { 
+            margin-bottom: 20px; 
+            padding: 15px; 
+            background: #f8f9fa; 
+            border-radius: 8px; 
+            border: 1px solid #dee2e6;
+        }
+        
+        input { 
+            padding: 10px; 
+            margin: 5px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+        }
+
+        button { 
+            padding: 10px 20px; 
+            background-color: #1a73e8; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: bold;
+        }
+
+        button:hover { background-color: #1557b0; }
+
+        /* Tablo tasarımı */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #e9ecef; }
+        
+        /* Görsel boyutu (50px) */
+        img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+
+        /* SINAV ŞARTI: Stok Renklendirmesi */
+        .stok-kritik { background-color: #f8d7da !important; color: #721c24; } /* Kırmızı (Stok <= 3) */
+        .stok-uygun { background-color: #d4edda !important; color: #155724; }  /* Yeşil (Stok > 3) */
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Akıllı Kafe Stok Paneli</h1>
+
+    <!-- Arama Bölümü -->
+    <div class="panel-section">
+        <label><strong>Ürün Ara:</strong></label>
+        <input type="text" id="aramaInput" placeholder="Ürün adını yazın..." onkeyup="aramaYap()" style="width: 70%;">
+    </div>
+
+    <!-- Ürün Tablosu -->
+    <table>
+        <thead>
+            <tr>
+                <th>Görsel</th>
+                <th>Ürün Adı</th>
+                <th>Kategori</th>
+                <th>Stok</th>
+            </tr>
+        </thead>
+        <tbody id="tabloGovde">
+            <!-- JavaScript burayı otomatik dolduracak -->
+        </tbody>
+    </table>
+
+    <!-- Yeni Ürün Ekleme Formu -->
+    <div class="panel-section" style="margin-top: 20px;">
+        <h3>Yeni Ürün Kaydı</h3>
+        <input type="text" id="yeniAd" placeholder="Ürün Adı">
+        <input type="number" id="yeniStok" placeholder="Stok Adedi">
+        <button onclick="urunEkle()">Ekle</button>
+    </div>
+</div>
+
+<script>
+    // Ürünlerin tutulduğu ana dizi (Array)
+    let urunler = [
+        { ad: "Kahve", stok: 10, kategori: "İçecek", gorsel: "img/kahve.jpg" },
+        { ad: "Tost", stok: 2, kategori: "Yiyecek", gorsel: "img/tost.jpg" },
+        { ad: "Çay", stok: 15, kategori: "İçecek", gorsel: "img/cay.jpg" },
+        { ad: "Limonata", stok: 1, kategori: "İçecek", gorsel: "img/limonata.jpg" },
+        { ad: "Pasta", stok: 5, kategori: "Tatlı", gorsel: "img/pasta.jpg" }
+    ];
+
+    // Sayfa yüklendiğinde tabloyu ilk kez dolduran başlatıcı
+    window.onload = function() {
+        tabloyuGoster(urunler);
+    };
+
+    // // Bu fonksiyon, verilen ürün listesini HTML tablosuna yazar ve stok kontrolü yapar
+    function tabloyuGoster(liste) {
+        const tabloElementi = document.getElementById("tabloGovde");
+        tabloElementi.innerHTML = ""; // Mevcut listeyi temizle
+
+        liste.forEach(function(urun) {
+            let satir = document.createElement("tr");
+
+            // Stok seviyesine göre renk sınıfı atama
+            if (urun.stok <= 3) {
+                satir.className = "stok-kritik"; // Kırmızı arka plan
+            } else {
+                satir.className = "stok-uygun";  // Yeşil arka plan
+            }
+
+            satir.innerHTML = `
+                <td>
+                    <img src="${urun.gorsel}" alt="${urun.ad}" onerror="this.src='img/varsayilan.jpg'">
+                </td>
+                <td>${urun.ad}</td>
+                <td>${urun.kategori}</td>
+                <td>${urun.stok} adet</td>
+            `;
+
+            tabloElementi.appendChild(satir);
+        });
+    }
+
+    // // Bu fonksiyon, arama kutusuna yazılan metne göre anlık filtreleme yapar
+    function aramaYap() {
+        let metin = document.getElementById("aramaInput").value.toLowerCase();
+        
+        // filter ve includes metodları ile arama mantığı
+        let sonuclar = urunler.filter(function(urun) {
+            return urun.ad.toLowerCase().includes(metin);
+        });
+
+        tabloyuGoster(sonuclar);
+    }
+
+    // // Bu fonksiyon, formdaki verileri alıp diziye yeni ürün ekler ve tabloyu günceller
+    function urunEkle() {
+        let isimInput = document.getElementById("yeniAd");
+        let stokInput = document.getElementById("yeniStok");
+
+        let isim = isimInput.value.trim();
+        let stok = parseInt(stokInput.value);
+
+        // Boş veri kontrolü
+        if (isim === "" || isNaN(stok)) {
+            alert("Lütfen tüm alanları doğru doldurun!");
+            return;
+        }
+
+        // Yeni objeyi diziye ekle
+        urunler.push({
+            ad: isim,
+            stok: stok,
+            kategori: "Genel",
+            gorsel: "img/varsayilan.jpg"
+        });
+
+        // Tabloyu güncelle ve formu temizle
+        tabloyuGoster(urunler);
+        isimInput.value = "";
+        stokInput.value = "";
+    }
+</script>
+
+</body>
+</html>

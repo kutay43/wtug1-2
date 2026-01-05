@@ -1,0 +1,5 @@
+SINAV İÇİN KRİTİK İPUÇLARI 
+•	Arama Mantığı: filter() ve includes() metodlarını kullanabilirsin.
+•	Görsel Yolları: Görsellerin img/ klasörü içinde olduğundan emin ol.
+•	AI Kullanırken: "Bana stok miktarı 3'ten az olan satırları kırmızı yapan bir JavaScript fonksiyonu yazar mısın?" gibi net sorular sor.
+•	Hata Alırsan: Tarayıcıda F12 > Console sekmesini kontrol etmeyi unutma!
